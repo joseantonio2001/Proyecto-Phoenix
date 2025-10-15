@@ -10,7 +10,7 @@ El proyecto implementa una arquitectura inspirada en microservicios que promueve
 
 ✅ **Fase I - Punto 2.1: Construcción del Conector del Exchange - COMPLETADO**
 
-El proyecto ha completado exitosamente la implementación del punto "2.1. Construcción del Conector del Exchange" de la Fase I. La funcionalidad actual se centra en:
+El proyecto ha completado exitosamente la implementación del punto "2.1. Construcción del Conector del Exchange" de la Fase I. La funcionalidad incluye:
 
 - **Conexión robusta al exchange** mediante encapsulación completa de ccxt
 - **Obtención y validación crítica de datos OHLCV** con 6 niveles de verificación
@@ -19,10 +19,21 @@ El proyecto ha completado exitosamente la implementación del punto "2.1. Constr
 - **Logging detallado** para monitorización y debugging
 - **Calidad de producción** con type hints, documentación completa y cumplimiento PEP 8
 
+✅ **Fase I - Punto 2.2: El Motor de Análisis Técnico - COMPLETADO**
+
+El sistema ahora enriquece los datos OHLCV con un conjunto configurable de indicadores técnicos utilizando pandas-ta:
+
+- **EMA21** (Media Móvil Exponencial) con período configurable
+- **RSI14** (Índice de Fuerza Relativa) con período configurable  
+- **MACD** (Convergencia/Divergencia de Medias Móviles) con tres componentes: línea principal, señal e histograma
+- **Media de Volumen** (promedio móvil simple del volumen) con período configurable
+- **Validación automática** de calidad e integridad de indicadores
+- **Configuración flexible** de todos los períodos desde config.ini
+
 ### Próximos Pasos
-- Punto 2.2: El Motor de Análisis Técnico
-- Implementación de indicadores técnicos con pandas-ta
-- Desarrollo de la lógica de señales de trading
+- Punto 2.3: Implementación de la Lógica de Trading
+- Desarrollo de funciones de detección de señales alcistas y bajistas
+- Implementación de la máquina de estados para transiciones de señales
 
 ## Pila Tecnológica
 
@@ -49,7 +60,7 @@ proyecto-phoenix/
 ├── core/                     # Núcleo del sistema de análisis
 │   ├── __init__.py
 │   ├── exchange_connector.py # Conector robusto del exchange
-│   ├── analysis_engine.py    # Motor de análisis técnico (futuro)
+│   ├── analysis_engine.py    # Motor de análisis técnico
 │   ├── data_validator.py     # Validador de datos (futuro)
 │   └── indicators.py         # Indicadores técnicos (futuro)
 ├── services/                 # Servicios del sistema
@@ -143,13 +154,44 @@ proyecto-phoenix/
 Al ejecutar correctamente, deberías ver una salida similar a:
 
 ```
-2025-10-15 22:12:20,314 - phoenix - INFO - === PROYECTO PHOENIX - FASE I ===
-2025-10-15 22:12:20,315 - phoenix - INFO - Iniciando conector del exchange...
-2025-10-15 22:12:23,524 - phoenix - INFO - Exchange conectado: {'id': 'binance', 'name': 'Binance', 'has_fetch_ohlcv': True, ...}
-2025-10-15 22:12:23,820 - phoenix - INFO - === DATOS OHLCV VALIDADOS ===
-2025-10-15 22:12:23,820 - phoenix - INFO - Filas obtenidas: 200
-2025-10-15 22:12:23,820 - phoenix - INFO - Rango temporal: 2025-09-29 06:00:00 a 2025-10-15 20:00:00
-2025-10-15 22:12:23,831 - phoenix - INFO - === CONECTOR DEL EXCHANGE - IMPLEMENTACIÓN EXITOSA ===
+2025-10-15 22:52:47,498 - phoenix - INFO - === PROYECTO PHOENIX - FASE I: NÚCLEO DE ANÁLISIS ===
+2025-10-15 22:52:47,498 - phoenix - INFO - Iniciando integración completa: Conector + Motor de Análisis...
+2025-10-15 22:52:47,498 - phoenix - INFO - --- PASO 1: INICIALIZANDO CONECTOR DEL EXCHANGE ---
+2025-10-15 22:52:51,676 - phoenix - INFO - Exchange conectado: Binance (binance)
+2025-10-15 22:52:51,676 - phoenix - INFO - Obteniendo datos OHLCV para BTC/USDC en 2h
+2025-10-15 22:52:51,933 - phoenix - INFO - === DATOS OHLCV OBTENIDOS ===
+2025-10-15 22:52:51,934 - phoenix - INFO - Filas obtenidas: 200
+2025-10-15 22:52:51,934 - phoenix - INFO - Rango temporal: 2025-09-29 06:00:00 a 2025-10-15 20:00:00
+2025-10-15 22:52:51,934 - phoenix - INFO - Precio actual (último cierre): 111314.14
+2025-10-15 22:52:51,935 - phoenix - INFO - --- PASO 2: INICIALIZANDO MOTOR DE ANÁLISIS TÉCNICO ---
+2025-10-15 22:52:51,935 - phoenix - INFO - Configuración del motor: {'ema_period': 21, 'rsi_period': 14, 'macd_fast': 12, 'macd_slow': 26, 'macd_signal': 9, 'volume_avg_period': 20}
+2025-10-15 22:52:51,935 - phoenix - INFO - Calculando indicadores técnicos...
+2025-10-15 22:52:51,941 - phoenix - INFO - === DATAFRAME ENRIQUECIDO CON INDICADORES ===
+2025-10-15 22:52:51,942 - phoenix - INFO - Columnas totales: 11
+2025-10-15 22:52:51,942 - phoenix - INFO - Indicadores añadidos: ['EMA21', 'RSI14', 'MACD', 'MACD_Signal', 'MACD_Histogram', 'Volume_Avg20']
+2025-10-15 22:52:51,942 - phoenix - INFO - === VALORES ACTUALES DE INDICADORES ===
+2025-10-15 22:52:51,942 - phoenix - INFO - timestamp: 2025-10-15 20:00:00
+2025-10-15 22:52:51,943 - phoenix - INFO - close_price: 111314.1400
+2025-10-15 22:52:51,943 - phoenix - INFO - ema21: 112267.9253
+2025-10-15 22:52:51,943 - phoenix - INFO - rsi14: 39.4834
+2025-10-15 22:52:51,943 - phoenix - INFO - macd: -629.9653
+2025-10-15 22:52:51,943 - phoenix - INFO - macd_signal: -547.6190
+2025-10-15 22:52:51,944 - phoenix - INFO - macd_histogram: -82.3462
+2025-10-15 22:52:51,944 - phoenix - INFO - volume: 202.1171
+2025-10-15 22:52:51,944 - phoenix - INFO - volume_avg20: 519.9924
+2025-10-15 22:52:51,959 - phoenix - INFO - === VERIFICACIÓN DE CALIDAD DE INDICADORES ===
+2025-10-15 22:52:51,959 - phoenix - INFO - EMA21: 180/200 valores válidos (90.0%)
+2025-10-15 22:52:51,960 - phoenix - INFO - RSI14: 199/200 valores válidos (99.5%)
+2025-10-15 22:52:51,960 - phoenix - INFO - MACD: 175/200 valores válidos (87.5%)
+2025-10-15 22:52:51,960 - phoenix - INFO - MACD_Signal: 167/200 valores válidos (83.5%)
+2025-10-15 22:52:51,960 - phoenix - INFO - MACD_Histogram: 167/200 valores válidos (83.5%)
+2025-10-15 22:52:51,961 - phoenix - INFO - Volume_Avg20: 181/200 valores válidos (90.5%)
+2025-10-15 22:52:51,961 - phoenix - INFO - ✅ Todos los indicadores tienen valores válidos en las últimas 10 velas
+2025-10-15 22:52:51,962 - phoenix - INFO - === INTEGRACIÓN FASE I - COMPLETADA EXITOSAMENTE ===
+2025-10-15 22:52:51,962 - phoenix - INFO - ✅ Conector del Exchange: OPERATIVO
+2025-10-15 22:52:51,962 - phoenix - INFO - ✅ Motor de Análisis Técnico: OPERATIVO
+2025-10-15 22:52:51,962 - phoenix - INFO - ✅ Indicadores calculados: EMA21, RSI14, MACD (3 componentes), Media de Volumen
+2025-10-15 22:52:51,962 - phoenix - INFO - 🚀 Sistema listo para la siguiente fase: Lógica de Señales de Trading
 ```
 
 ## Configuración
@@ -202,15 +244,15 @@ El proyecto sigue un paradigma inspirado en microservicios con los siguientes co
 
 ### ✅ Implementado
 - **Conector robusto del exchange** con encapsulación ccxt completa
-- **Validación crítica de datos** (6 niveles de verificación)
+- **Motor de análisis técnico** con pandas-ta y indicadores configurables
+- **Validación crítica de datos** (6 niveles de verificación + integridad de indicadores)
 - **Gestión exhaustiva de errores** con reintentos automáticos
 - **Sistema de configuración centralizado** y seguro
 - **Logging profesional** con rotación automática
 - **Calidad de código de producción** (PEP 8, type hints, documentación)
 
 ### 🔄 En Desarrollo (Próximas Fases)
-- Motor de análisis técnico con pandas-ta
-- Lógica de señales de trading (EMA, RSI, MACD, Volumen)
+- Lógica de señales de trading (detección de patrones alcistas/bajistas)
 - Bot de Telegram interactivo con gráficos
 - Integración con IA para análisis contextual
 - Programador de tareas automático 24/7
