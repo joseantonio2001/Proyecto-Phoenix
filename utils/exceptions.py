@@ -34,5 +34,10 @@ class ConfigurationError(PhoenixError):
 
 
 class AnalysisError(PhoenixError):
-    """Error durante el análisis técnico."""
+    """Error durante el análisis técnico o de señales."""
+    pass
+
+
+class SignalDetectionError(PhoenixError):
+    """Error específico durante la detección de señales de trading."""
     pass

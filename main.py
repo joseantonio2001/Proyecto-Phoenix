@@ -1,8 +1,8 @@
 """
-Script principal del Proyecto Phoenix - Fase I.
+Script principal del Proyecto Phoenix - Fase I Completa.
 
-Demuestra la integración completa del conector del exchange y el motor de análisis técnico
-según las especificaciones del punto 2.2 del documento "Proyecto Phoenix".
+Demuestra la integración completa del conector del exchange, motor de análisis técnico
+y la lógica de señales de trading según las especificaciones del documento "Proyecto Phoenix".
 """
 
 import asyncio
@@ -12,12 +12,14 @@ from utils.config_manager import ConfigManager
 from utils.logger import setup_logging
 from core.exchange_connector import ExchangeConnector
 from core.analysis_engine import TechnicalAnalysisEngine
+from core.trading_signals import TradingSignalsEngine, SignalType
 from utils.exceptions import PhoenixError
 
 
 async def main():
     """
     Función principal que demuestra la integración completa de la Fase I.
+    Pipeline: Exchange → Análisis Técnico → Señales de Trading
     """
     try:
         # Inicializar configuración
@@ -25,8 +27,8 @@ async def main():
         
         # Configurar logging
         logger = setup_logging(config)
-        logger.info("=== PROYECTO PHOENIX - FASE I: NÚCLEO DE ANÁLISIS ===")
-        logger.info("Iniciando integración completa: Conector + Motor de Análisis...")
+        logger.info("=== PROYECTO PHOENIX - FASE I: NÚCLEO DE ANÁLISIS COMPLETO ===")
+        logger.info("Iniciando pipeline completo: Conector → Análisis → Señales...")
         
         # === PASO 1: CONECTOR DEL EXCHANGE ===
         logger.info("--- PASO 1: INICIALIZANDO CONECTOR DEL EXCHANGE ---")
@@ -72,65 +74,102 @@ async def main():
         logger.info(f"Columnas totales: {len(enriched_df.columns)}")
         logger.info(f"Indicadores añadidos: {analysis_engine._get_indicator_columns()}")
         
-        # Obtener resumen de indicadores actuales
-        indicators_summary = analysis_engine.get_latest_indicators_summary(enriched_df)
-        logger.info("=== VALORES ACTUALES DE INDICADORES ===")
-        for key, value in indicators_summary.items():
-            if value is not None:
-                if isinstance(value, float):
-                    logger.info(f"{key}: {value:.4f}")
-                else:
-                    logger.info(f"{key}: {value}")
-            else:
-                logger.info(f"{key}: N/A")
+        # === PASO 3: LÓGICA DE SEÑALES DE TRADING ===
+        logger.info("--- PASO 3: INICIALIZANDO MOTOR DE SEÑALES DE TRADING ---")
+        signals_engine = TradingSignalsEngine()
         
-        # === MOSTRAR PRIMERAS Y ÚLTIMAS 5 FILAS ===
-        logger.info("=== PRIMERAS 5 FILAS (DATOS + INDICADORES) ===")
-        # Mostrar solo las columnas más relevantes para evitar logs muy largos
-        relevant_columns = ['open', 'high', 'low', 'close', 'volume', 'EMA21', 'RSI14', 'MACD', 'MACD_Histogram', 'Volume_Avg20']
-        available_columns = [col for col in relevant_columns if col in enriched_df.columns]
+        logger.info("Analizando señales de trading con lógica stateful...")
+        signals_result = signals_engine.analyze_signals(enriched_df)
         
-        logger.info(f"Columnas mostradas: {available_columns}")
-        logger.info("\n" + str(enriched_df[available_columns].head()))
+        # === RESULTADOS DEL ANÁLISIS DE SEÑALES ===
+        logger.info("=== ANÁLISIS DE SEÑALES COMPLETADO ===")
+        signal_type = signals_result['signal_type']
         
-        logger.info("=== ÚLTIMAS 5 FILAS (DATOS + INDICADORES) ===")
-        logger.info("\n" + str(enriched_df[available_columns].tail()))
+        # Generar explicación detallada
+        signal_explanation = signals_engine.get_signal_explanation(signals_result)
+        logger.info("=== RESULTADO DE LA DETECCIÓN DE SEÑALES ===")
+        logger.info(f"\n{signal_explanation}")
         
-        # === VERIFICAR CALIDAD DE LOS DATOS ===
-        logger.info("=== VERIFICACIÓN DE CALIDAD DE INDICADORES ===")
+        # === DETALLES TÉCNICOS DE LA SEÑAL ===
+        logger.info("=== DETALLES TÉCNICOS DEL ANÁLISIS ===")
         
-        # Contar valores válidos por indicador
-        indicator_quality = {}
-        for indicator in analysis_engine._get_indicator_columns():
-            if indicator in enriched_df.columns:
-                total_rows = len(enriched_df)
-                valid_values = enriched_df[indicator].notna().sum()
-                coverage_pct = (valid_values / total_rows) * 100
-                indicator_quality[indicator] = {
-                    'valid_values': valid_values,
-                    'total_rows': total_rows,
-                    'coverage_percent': coverage_pct
-                }
-                logger.info(f"{indicator}: {valid_values}/{total_rows} valores válidos ({coverage_pct:.1f}%)")
-        
-        # === VERIFICAR DATOS DE LAS ÚLTIMAS 10 VELAS ===
-        logger.info("=== INDICADORES EN LAS ÚLTIMAS 10 VELAS ===")
-        recent_data = enriched_df[available_columns].tail(10)
-        
-        # Verificar si hay algún NaN en las últimas filas
-        recent_nulls = recent_data.isnull().sum()
-        if recent_nulls.sum() > 0:
-            logger.warning("Valores nulos encontrados en datos recientes:")
-            for col, null_count in recent_nulls[recent_nulls > 0].items():
-                logger.warning(f"  {col}: {null_count} valores nulos")
+        if signal_type == SignalType.BULLISH_SIGNAL:
+            logger.info("🟢 SEÑAL ALCISTA DETECTADA")
+            bullish_details = signals_result['bullish_analysis']
+            logger.info("Condiciones actuales cumplidas:")
+            for condition, met in bullish_details['current_conditions'].items():
+                status = "✅" if met else "❌"
+                logger.info(f"  {status} {condition}")
+            
+            logger.info("Transición detectada: Las condiciones pasaron de NO cumplidas a SÍ cumplidas")
+            
+        elif signal_type == SignalType.BEARISH_SIGNAL:
+            logger.info("🔴 SEÑAL BAJISTA DETECTADA")
+            bearish_details = signals_result['bearish_analysis']
+            logger.info("Condiciones actuales cumplidas:")
+            for condition, met in bearish_details['current_conditions'].items():
+                status = "✅" if met else "❌"
+                logger.info(f"  {status} {condition}")
+            
+            logger.info("Transición detectada: Las condiciones pasaron de NO cumplidas a SÍ cumplidas")
+            
         else:
-            logger.info("✅ Todos los indicadores tienen valores válidos en las últimas 10 velas")
+            logger.info("⚪ SIN SEÑAL RELEVANTE EN EL CICLO ACTUAL")
+            logger.info("Razón: No se detectó transición de estado en las condiciones de entrada")
+            
+            # Mostrar estado actual de condiciones alcistas
+            bullish_details = signals_result['bullish_analysis']
+            logger.info("Estado actual de condiciones alcistas:")
+            for condition, met in bullish_details['current_conditions'].items():
+                status = "✅" if met else "❌"
+                logger.info(f"  {status} {condition}")
+            
+            # Mostrar estado actual de condiciones bajistas
+            bearish_details = signals_result['bearish_analysis']
+            logger.info("Estado actual de condiciones bajistas:")
+            for condition, met in bearish_details['current_conditions'].items():
+                status = "✅" if met else "❌"
+                logger.info(f"  {status} {condition}")
         
-        logger.info("=== INTEGRACIÓN FASE I - COMPLETADA EXITOSAMENTE ===")
+        # === VALORES DE INDICADORES ACTUALES ===
+        logger.info("=== VALORES DE INDICADORES EN VELA ACTUAL ===")
+        market_conditions = signals_result['market_conditions']
+        logger.info(f"Timestamp: {signals_result['timestamp']}")
+        logger.info(f"Precio actual: ${market_conditions['current_price']:,.2f}")
+        logger.info(f"EMA21: ${market_conditions['ema21_value']:,.2f} ({market_conditions['price_vs_ema']})")
+        logger.info(f"RSI14: {market_conditions['rsi_value']:.2f} ({market_conditions['rsi_zone']})")
+        logger.info(f"MACD Histograma: {market_conditions['macd_histogram']:+.4f} ({market_conditions['macd_momentum']})")
+        logger.info(f"Volumen: {market_conditions['volume_ratio']:.2f}x promedio ({market_conditions['volume_status']})")
+        
+        # === COMPARACIÓN ENTRE VELAS (DETECCIÓN DE TRANSICIÓN) ===
+        logger.info("=== ANÁLISIS DE TRANSICIÓN ENTRE VELAS ===")
+        
+        if signal_type != SignalType.NO_SIGNAL:
+            # Hay señal - mostrar la transición
+            if signal_type == SignalType.BULLISH_SIGNAL:
+                details = signals_result['bullish_analysis']
+                logger.info("Transición Alcista Detectada:")
+            else:
+                details = signals_result['bearish_analysis']
+                logger.info("Transición Bajista Detectada:")
+            
+            logger.info(f"Vela anterior: Condiciones NO cumplidas ({not details['all_previous_met']})")
+            logger.info(f"Vela actual: Condiciones SÍ cumplidas ({details['all_current_met']})")
+            logger.info("✅ EVENTO DE TRANSICIÓN CONFIRMADO")
+        else:
+            logger.info("No se detectó transición válida:")
+            logger.info("• Las condiciones pueden estar cumplidas en ambas velas (sin evento)")
+            logger.info("• O las condiciones no están completamente cumplidas en la vela actual")
+            logger.info("• La lógica stateful evita alertas redundantes")
+        
+        # === ESTADO FINAL DEL SISTEMA ===
+        logger.info("=== FASE I - NÚCLEO DE ANÁLISIS: COMPLETADO EXITOSAMENTE ===")
         logger.info("✅ Conector del Exchange: OPERATIVO")
         logger.info("✅ Motor de Análisis Técnico: OPERATIVO")
-        logger.info("✅ Indicadores calculados: EMA21, RSI14, MACD (3 componentes), Media de Volumen")
-        logger.info("🚀 Sistema listo para la siguiente fase: Lógica de Señales de Trading")
+        logger.info("✅ Motor de Señales de Trading: OPERATIVO")
+        logger.info("✅ Lógica Stateful: Diferenciación entre estado y evento implementada")
+        logger.info(f"🎯 Resultado final del ciclo: {signal_type.value}")
+        logger.info("🚀 Sistema listo para la siguiente fase: Interfaz de Usuario y Bot de Telegram")
         
     except PhoenixError as e:
         logger.error(f"Error del Proyecto Phoenix: {str(e)}")

@@ -30,10 +30,26 @@ El sistema ahora enriquece los datos OHLCV con un conjunto configurable de indic
 - **Validación automática** de calidad e integridad de indicadores
 - **Configuración flexible** de todos los períodos desde config.ini
 
+✅ **Fase I - Punto 2.3: Implementación de la Lógica de Trading - COMPLETADO**
+
+El sistema ahora puede generar señales de trading (BULLISH_SIGNAL, BEARISH_SIGNAL, NO_SIGNAL) utilizando una lógica "stateful" avanzada:
+
+- **Detección inteligente de eventos**: Análisis de transición entre la vela anterior y actual para identificar cambios de estado
+- **Lógica stateful**: Diferenciación entre "estado" y "evento" para evitar alertas redundantes
+- **Reglas de señales precisas**: Implementación exacta de condiciones alcistas/bajistas basadas en EMA, RSI, MACD e indicadores de volumen
+- **Análisis de dos velas**: Comparación sistemática entre vela actual (iloc[-1]) y anterior (iloc[-2])
+- **Prevención de spam**: Las señales solo se generan cuando las condiciones pasan de NO cumplidas a SÍ cumplidas
+- **Estados claros y definidos**: Salida única y explícita del resultado del análisis
+
+🎯 **FASE I - NÚCLEO DE ANÁLISIS: COMPLETADA EXITOSAMENTE**
+
+El núcleo de análisis es ahora una unidad funcional, robusta y completa que proporciona la base computacional para todas las fases posteriores del proyecto.
+
 ### Próximos Pasos
-- Punto 2.3: Implementación de la Lógica de Trading
-- Desarrollo de funciones de detección de señales alcistas y bajistas
-- Implementación de la máquina de estados para transiciones de señales
+- **Fase II - La Interfaz de Usuario: Visualización e Interacción**
+- Punto 3.1: Motor de Gráficos Financieros con mplfinance
+- Desarrollo de visualización profesional de datos y señales
+- Integración de capacidades de exportación y personalización de gráficos
 
 ## Pila Tecnológica
 
@@ -61,6 +77,7 @@ proyecto-phoenix/
 │   ├── __init__.py
 │   ├── exchange_connector.py # Conector robusto del exchange
 │   ├── analysis_engine.py    # Motor de análisis técnico
+│   ├── trading_signals.py    # Motor de señales de trading
 │   ├── data_validator.py     # Validador de datos (futuro)
 │   └── indicators.py         # Indicadores técnicos (futuro)
 ├── services/                 # Servicios del sistema
@@ -68,7 +85,7 @@ proyecto-phoenix/
 │   ├── data_ingestion.py     # Servicio de ingesta (futuro)
 │   ├── presentation/         # Servicio de presentación
 │   │   ├── __init__.py
-│   │   ├── charting_engine.py    # Motor de gráficos (futuro)
+│   │   ├── charting_engine.py    # Motor de gráficos (próximo)
 │   │   └── ai_payload_formatter.py # Formateador IA (futuro)
 │   ├── notification_gateway.py   # Bot de Telegram (futuro)
 │   └── scheduler_service.py      # Programador de tareas (futuro)
@@ -84,14 +101,15 @@ proyecto-phoenix/
 ├── tests/                    # Suite de pruebas
 │   ├── __init__.py
 │   ├── test_exchange_connector.py
-│   └── test_analysis_engine.py
+│   ├── test_analysis_engine.py
+│   └── test_trading_signals.py
 └── logs/                     # Directorio de logs
     └── .gitkeep
 ```
 
 ### Directorios Clave
 
-- **`core/`**: Contiene el núcleo computacional del sistema - conector del exchange, motor de análisis y validación de datos
+- **`core/`**: Contiene el núcleo computacional completo del sistema - conector del exchange, motor de análisis técnico y motor de señales de trading
 - **`utils/`**: Utilidades transversales como gestión de configuración, logging y excepciones personalizadas  
 - **`logs/`**: Almacena los archivos de log rotativos para monitorización y debugging
 
@@ -107,7 +125,7 @@ proyecto-phoenix/
 
 1. **Clonar el repositorio**
    ```bash
-   git clone https://github.com/tu-usuario/proyecto-phoenix.git
+   git clone https://github.com/joseantonio2001/proyecto-phoenix.git
    cd proyecto-phoenix
    ```
 
@@ -154,44 +172,64 @@ proyecto-phoenix/
 Al ejecutar correctamente, deberías ver una salida similar a:
 
 ```
-2025-10-15 22:52:47,498 - phoenix - INFO - === PROYECTO PHOENIX - FASE I: NÚCLEO DE ANÁLISIS ===
-2025-10-15 22:52:47,498 - phoenix - INFO - Iniciando integración completa: Conector + Motor de Análisis...
-2025-10-15 22:52:47,498 - phoenix - INFO - --- PASO 1: INICIALIZANDO CONECTOR DEL EXCHANGE ---
-2025-10-15 22:52:51,676 - phoenix - INFO - Exchange conectado: Binance (binance)
-2025-10-15 22:52:51,676 - phoenix - INFO - Obteniendo datos OHLCV para BTC/USDC en 2h
-2025-10-15 22:52:51,933 - phoenix - INFO - === DATOS OHLCV OBTENIDOS ===
-2025-10-15 22:52:51,934 - phoenix - INFO - Filas obtenidas: 200
-2025-10-15 22:52:51,934 - phoenix - INFO - Rango temporal: 2025-09-29 06:00:00 a 2025-10-15 20:00:00
-2025-10-15 22:52:51,934 - phoenix - INFO - Precio actual (último cierre): 111314.14
-2025-10-15 22:52:51,935 - phoenix - INFO - --- PASO 2: INICIALIZANDO MOTOR DE ANÁLISIS TÉCNICO ---
-2025-10-15 22:52:51,935 - phoenix - INFO - Configuración del motor: {'ema_period': 21, 'rsi_period': 14, 'macd_fast': 12, 'macd_slow': 26, 'macd_signal': 9, 'volume_avg_period': 20}
-2025-10-15 22:52:51,935 - phoenix - INFO - Calculando indicadores técnicos...
-2025-10-15 22:52:51,941 - phoenix - INFO - === DATAFRAME ENRIQUECIDO CON INDICADORES ===
-2025-10-15 22:52:51,942 - phoenix - INFO - Columnas totales: 11
-2025-10-15 22:52:51,942 - phoenix - INFO - Indicadores añadidos: ['EMA21', 'RSI14', 'MACD', 'MACD_Signal', 'MACD_Histogram', 'Volume_Avg20']
-2025-10-15 22:52:51,942 - phoenix - INFO - === VALORES ACTUALES DE INDICADORES ===
-2025-10-15 22:52:51,942 - phoenix - INFO - timestamp: 2025-10-15 20:00:00
-2025-10-15 22:52:51,943 - phoenix - INFO - close_price: 111314.1400
-2025-10-15 22:52:51,943 - phoenix - INFO - ema21: 112267.9253
-2025-10-15 22:52:51,943 - phoenix - INFO - rsi14: 39.4834
-2025-10-15 22:52:51,943 - phoenix - INFO - macd: -629.9653
-2025-10-15 22:52:51,943 - phoenix - INFO - macd_signal: -547.6190
-2025-10-15 22:52:51,944 - phoenix - INFO - macd_histogram: -82.3462
-2025-10-15 22:52:51,944 - phoenix - INFO - volume: 202.1171
-2025-10-15 22:52:51,944 - phoenix - INFO - volume_avg20: 519.9924
-2025-10-15 22:52:51,959 - phoenix - INFO - === VERIFICACIÓN DE CALIDAD DE INDICADORES ===
-2025-10-15 22:52:51,959 - phoenix - INFO - EMA21: 180/200 valores válidos (90.0%)
-2025-10-15 22:52:51,960 - phoenix - INFO - RSI14: 199/200 valores válidos (99.5%)
-2025-10-15 22:52:51,960 - phoenix - INFO - MACD: 175/200 valores válidos (87.5%)
-2025-10-15 22:52:51,960 - phoenix - INFO - MACD_Signal: 167/200 valores válidos (83.5%)
-2025-10-15 22:52:51,960 - phoenix - INFO - MACD_Histogram: 167/200 valores válidos (83.5%)
-2025-10-15 22:52:51,961 - phoenix - INFO - Volume_Avg20: 181/200 valores válidos (90.5%)
-2025-10-15 22:52:51,961 - phoenix - INFO - ✅ Todos los indicadores tienen valores válidos en las últimas 10 velas
-2025-10-15 22:52:51,962 - phoenix - INFO - === INTEGRACIÓN FASE I - COMPLETADA EXITOSAMENTE ===
-2025-10-15 22:52:51,962 - phoenix - INFO - ✅ Conector del Exchange: OPERATIVO
-2025-10-15 22:52:51,962 - phoenix - INFO - ✅ Motor de Análisis Técnico: OPERATIVO
-2025-10-15 22:52:51,962 - phoenix - INFO - ✅ Indicadores calculados: EMA21, RSI14, MACD (3 componentes), Media de Volumen
-2025-10-15 22:52:51,962 - phoenix - INFO - 🚀 Sistema listo para la siguiente fase: Lógica de Señales de Trading
+2025-10-16 00:41:27,659 - phoenix - INFO - === PROYECTO PHOENIX - FASE I: NÚCLEO DE ANÁLISIS COMPLETO ===
+2025-10-16 00:41:27,659 - phoenix - INFO - Iniciando pipeline completo: Conector → Análisis → Señales...
+2025-10-16 00:41:27,659 - phoenix - INFO - --- PASO 1: INICIALIZANDO CONECTOR DEL EXCHANGE ---
+2025-10-16 00:41:32,903 - phoenix - INFO - Exchange conectado: Binance (binance)
+2025-10-16 00:41:32,903 - phoenix - INFO - Obteniendo datos OHLCV para BTC/USDC en 2h
+2025-10-16 00:41:33,160 - phoenix - INFO - === DATOS OHLCV OBTENIDOS ===
+2025-10-16 00:41:33,161 - phoenix - INFO - Filas obtenidas: 200
+2025-10-16 00:41:33,161 - phoenix - INFO - Rango temporal: 2025-09-29 08:00:00 a 2025-10-15 22:00:00
+2025-10-16 00:41:33,161 - phoenix - INFO - Precio actual (último cierre): 111332.40
+2025-10-16 00:41:33,161 - phoenix - INFO - --- PASO 2: INICIALIZANDO MOTOR DE ANÁLISIS TÉCNICO ---
+2025-10-16 00:41:33,162 - phoenix - INFO - Configuración del motor: {'ema_period': 21, 'rsi_period': 14, 'macd_fast': 12, 'macd_slow': 26, 'macd_signal': 9, 'volume_avg_period': 20}
+2025-10-16 00:41:33,162 - phoenix - INFO - Calculando indicadores técnicos...
+2025-10-16 00:41:33,168 - phoenix - INFO - === DATAFRAME ENRIQUECIDO CON INDICADORES ===
+2025-10-16 00:41:33,168 - phoenix - INFO - Columnas totales: 11
+2025-10-16 00:41:33,169 - phoenix - INFO - Indicadores añadidos: ['EMA21', 'RSI14', 'MACD', 'MACD_Signal', 'MACD_Histogram', 'Volume_Avg20']
+2025-10-16 00:41:33,169 - phoenix - INFO - --- PASO 3: INICIALIZANDO MOTOR DE SEÑALES DE TRADING ---
+2025-10-16 00:41:33,169 - phoenix - INFO - Analizando señales de trading con lógica stateful...
+2025-10-16 00:41:33,170 - phoenix - INFO - === ANÁLISIS DE SEÑALES COMPLETADO ===
+2025-10-16 00:41:33,170 - phoenix - INFO - === RESULTADO DE LA DETECCIÓN DE SEÑALES ===
+2025-10-16 00:41:33,171 - phoenix - INFO - 
+⚪ SIN SEÑAL RELEVANTE:
+• Precio $111,332.40 vs EMA21 $112,148.96 (BELOW)
+• RSI 41.2 en zona NEUTRAL_BEARISH
+• MACD Histograma NEGATIVE (-75.92)
+• Volumen LOW (ratio: 0.18x)
+• No se detectó transición en las condiciones de entrada
+2025-10-16 00:41:33,171 - phoenix - INFO - === DETALLES TÉCNICOS DEL ANÁLISIS ===
+2025-10-16 00:41:33,171 - phoenix - INFO - ⚪ SIN SEÑAL RELEVANTE EN EL CICLO ACTUAL
+2025-10-16 00:41:33,171 - phoenix - INFO - Razón: No se detectó transición de estado en las condiciones de entrada
+2025-10-16 00:41:33,171 - phoenix - INFO - Estado actual de condiciones alcistas:
+2025-10-16 00:41:33,172 - phoenix - INFO -   ❌ price_above_ema
+2025-10-16 00:41:33,172 - phoenix - INFO -   ✅ rsi_in_range
+2025-10-16 00:41:33,172 - phoenix - INFO -   ❌ macd_histogram_positive
+2025-10-16 00:41:33,172 - phoenix - INFO -   ❌ volume_above_average
+2025-10-16 00:41:33,172 - phoenix - INFO - Estado actual de condiciones bajistas:
+2025-10-16 00:41:33,172 - phoenix - INFO -   ✅ price_below_ema
+2025-10-16 00:41:33,172 - phoenix - INFO -   ❌ rsi_in_range
+2025-10-16 00:41:33,173 - phoenix - INFO -   ✅ macd_histogram_negative
+2025-10-16 00:41:33,173 - phoenix - INFO -   ❌ volume_above_average
+2025-10-16 00:41:33,173 - phoenix - INFO - === VALORES DE INDICADORES EN VELA ACTUAL ===
+2025-10-16 00:41:33,173 - phoenix - INFO - Timestamp: 2025-10-15 22:00:00
+2025-10-16 00:41:33,173 - phoenix - INFO - Precio actual: $111,332.40
+2025-10-16 00:41:33,173 - phoenix - INFO - EMA21: $112,148.96 (BELOW)
+2025-10-16 00:41:33,173 - phoenix - INFO - RSI14: 41.16 (NEUTRAL_BEARISH)
+2025-10-16 00:41:33,173 - phoenix - INFO - MACD Histograma: -75.9243 (NEGATIVE)
+2025-10-16 00:41:33,174 - phoenix - INFO - Volumen: 0.18x promedio (LOW)
+2025-10-16 00:41:33,174 - phoenix - INFO - === ANÁLISIS DE TRANSICIÓN ENTRE VELAS ===
+2025-10-16 00:41:33,174 - phoenix - INFO - No se detectó transición válida:
+2025-10-16 00:41:33,174 - phoenix - INFO - • Las condiciones pueden estar cumplidas en ambas velas (sin evento)
+2025-10-16 00:41:33,174 - phoenix - INFO - • O las condiciones no están completamente cumplidas en la vela actual
+2025-10-16 00:41:33,174 - phoenix - INFO - • La lógica stateful evita alertas redundantes
+2025-10-16 00:41:33,174 - phoenix - INFO - === FASE I - NÚCLEO DE ANÁLISIS: COMPLETADO EXITOSAMENTE ===
+2025-10-16 00:41:33,174 - phoenix - INFO - ✅ Conector del Exchange: OPERATIVO
+2025-10-16 00:41:33,174 - phoenix - INFO - ✅ Motor de Análisis Técnico: OPERATIVO
+2025-10-16 00:41:33,174 - phoenix - INFO - ✅ Motor de Señales de Trading: OPERATIVO
+2025-10-16 00:41:33,174 - phoenix - INFO - ✅ Lógica Stateful: Diferenciación entre estado y evento implementada
+2025-10-16 00:41:33,175 - phoenix - INFO - 🎯 Resultado final del ciclo: NO_SIGNAL
+2025-10-16 00:41:33,175 - phoenix - INFO - 🚀 Sistema listo para la siguiente fase: Interfaz de Usuario y Bot de Telegram
 ```
 
 ## Configuración
@@ -235,7 +273,7 @@ file = logs/phoenix.log  # Archivo de log
 El proyecto sigue un paradigma inspirado en microservicios con los siguientes componentes:
 
 - **Servicio de Ingesta**: Conexión y obtención de datos del exchange
-- **Núcleo de Análisis**: Motor computacional con indicadores técnicos  
+- **Núcleo de Análisis**: Motor computacional con indicadores técnicos y señales de trading  
 - **Servicio de Presentación**: Generación de gráficos y formato para IA
 - **Pasarela de Notificación**: Bot de Telegram interactivo
 - **Servicio de Programación**: Orquestador de tareas periódicas
@@ -245,6 +283,7 @@ El proyecto sigue un paradigma inspirado en microservicios con los siguientes co
 ### ✅ Implementado
 - **Conector robusto del exchange** con encapsulación ccxt completa
 - **Motor de análisis técnico** con pandas-ta y indicadores configurables
+- **Motor de señales de trading** con lógica stateful para detección inteligente de eventos
 - **Validación crítica de datos** (6 niveles de verificación + integridad de indicadores)
 - **Gestión exhaustiva de errores** con reintentos automáticos
 - **Sistema de configuración centralizado** y seguro
@@ -252,11 +291,21 @@ El proyecto sigue un paradigma inspirado en microservicios con los siguientes co
 - **Calidad de código de producción** (PEP 8, type hints, documentación)
 
 ### 🔄 En Desarrollo (Próximas Fases)
-- Lógica de señales de trading (detección de patrones alcistas/bajistas)
-- Bot de Telegram interactivo con gráficos
+- Motor de gráficos financieros con mplfinance (Fase II - Punto 3.1)
+- Bot de Telegram interactivo con visualizaciones
 - Integración con IA para análisis contextual
 - Programador de tareas automático 24/7
 - Evolución hacia trading automatizado
+
+## Pipeline de Procesamiento
+
+El sistema implementa un pipeline completo de procesamiento de datos financieros:
+
+1. **Ingesta de Datos**: Obtención robusta de datos OHLCV del exchange
+2. **Enriquecimiento**: Cálculo de indicadores técnicos con pandas-ta
+3. **Análisis de Señales**: Detección inteligente de patrones de trading
+4. **Evaluación Stateful**: Diferenciación entre estado y evento para prevenir spam
+5. **Resultado Final**: Generación de señal clara (BULLISH_SIGNAL, BEARISH_SIGNAL, NO_SIGNAL)
 
 ## Logs y Monitorización
 
